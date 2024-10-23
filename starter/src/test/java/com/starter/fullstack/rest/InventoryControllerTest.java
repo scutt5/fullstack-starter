@@ -36,11 +36,13 @@ public class InventoryControllerTest {
   private ObjectMapper objectMapper;
 
   private Inventory inventory;
+  private static final String ID = "ID";
+  private static final int NUM_INVENTORIES = 2;
 
   @Before
   public void setup() throws Throwable {
     this.inventory = new Inventory();
-    this.inventory.setId("ID");
+    this.inventory.setId(ID);
     this.inventory.setName("TEST");
     // Sets the Mongo ID for us
     this.inventory = this.mongoTemplate.save(this.inventory);
@@ -64,10 +66,8 @@ public class InventoryControllerTest {
         .content(this.objectMapper.writeValueAsString(this.inventory)))
       .andExpect(status().isOk());
     Assert.assertTrue(mongoTemplate.findAll(Inventory.class).contains(this.inventory));
-    Assert.assertEquals(2, this.mongoTemplate.findAll(Inventory.class).size());
+    Assert.assertEquals(NUM_INVENTORIES, this.mongoTemplate.findAll(Inventory.class).size());
   }
-
-
 
 }
 
