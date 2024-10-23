@@ -42,11 +42,9 @@ public class InventoryController {
    * @param inventory the inventory to be created.
    * @return The created inventory.
    * 
-   * This is my code!
    */
   @PostMapping
   public Inventory createInventory(@RequestBody Inventory inventory){
-    System.out.println("Inserted an inventory!!!!!!!!!");
     return this.inventoryDAO.create(inventory);
   }
 }
