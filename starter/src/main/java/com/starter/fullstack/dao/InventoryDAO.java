@@ -64,8 +64,10 @@ public class InventoryDAO {
    * @return Found Inventory.
    */
   public Optional<Inventory> retrieve(String id) {
-    // TODO
-    return Optional.empty();
+    Inventory ret = mongoTemplate.findById(id, Inventory.class);
+
+    //built-in null handling
+    return Optional.ofNullable(ret);
   }
 
   /**
@@ -85,7 +87,14 @@ public class InventoryDAO {
    * @return Deleted Inventory.
    */
   public Optional<Inventory> delete(String id) {
-    // TODO
+    //get Inventory by ID
+    if(retrieve(id).isPresent()){
+      Inventory ret = retrieve(id).get();
+      mongoTemplate.remove(ret);
+      return Optional.of(ret);
+    }
+
+    //otherwise
     return Optional.empty();
   }
 }
