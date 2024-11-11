@@ -10,6 +10,10 @@ import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexOperations;
 import org.springframework.util.Assert;
 
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import com.mongodb.client.result.DeleteResult;
+
 /**
  * Inventory DAO
  */
@@ -87,14 +91,18 @@ public class InventoryDAO {
    * @return Deleted Inventory.
    */
   public Optional<Inventory> delete(String id) {
-    //get Inventory by ID
-    if(retrieve(id).isPresent()){
-      Inventory ret = retrieve(id).get();
-      mongoTemplate.remove(ret);
-      return Optional.of(ret);
+    //to be used in return
+    Inventory retInventory = retrieve(id).get();
+
+    Query query = new Query(Criteria.where("id").is(id));
+    DeleteResult ret = this.mongoTemplate.remove(query, Inventory.class);
+  
+    //check for nothing match
+    if(ret.getDeletedCount() == 0){
+      return Optional.empty();
     }
 
     //otherwise
-    return Optional.empty();
+    return Optional.of(retInventory);
   }
 }
