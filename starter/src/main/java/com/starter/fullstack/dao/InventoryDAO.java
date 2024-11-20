@@ -91,18 +91,8 @@ public class InventoryDAO {
    * @return Deleted Inventory.
    */
   public Optional<Inventory> delete(String id) {
-    //to be used in return
-    Inventory retInventory = retrieve(id).get();
-
     Query query = new Query(Criteria.where("id").is(id));
-    DeleteResult ret = this.mongoTemplate.remove(query, Inventory.class);
-  
-    //check for nothing match
-    if(ret.getDeletedCount() == 0){
-      return Optional.empty();
-    }
-
-    //otherwise
-    return Optional.of(retInventory);
+   
+    return Optional.ofNullable(this.mongoTemplate.findAndRemove(query, Inventory.class));
   }
 }
