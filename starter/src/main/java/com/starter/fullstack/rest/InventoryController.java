@@ -1,4 +1,5 @@
 package com.starter.fullstack.rest;
+
 import com.starter.fullstack.api.Inventory;
 import com.starter.fullstack.dao.InventoryDAO;
 import java.util.List;
