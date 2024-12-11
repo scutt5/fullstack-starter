@@ -20,7 +20,7 @@ import org.testcontainers.utility.DockerImageName;
  */
 @DataMongoTest
 @RunWith(SpringRunner.class)
-public class InventoryDAOTest {
+public class InventoryDAOTest { 
   @ClassRule
   public static final MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.0.10"));
 
@@ -32,12 +32,12 @@ public class InventoryDAOTest {
   private static final String ID = "id";
 
   @Before
-  public void setup() {
+  public void setup() { 
     this.inventoryDAO = new InventoryDAO(this.mongoTemplate);
   }
 
   @After
-  public void tearDown() {
+  public void tearDown() { 
     this.mongoTemplate.dropCollection(Inventory.class);
   }
 
@@ -45,7 +45,7 @@ public class InventoryDAOTest {
    * Test Find All method.
    */
   @Test
-  public void findAll() {
+  public void findAll() { 
     Inventory inventory = new Inventory();
     inventory.setName(NAME);
     inventory.setProductType(PRODUCT_TYPE);
@@ -58,7 +58,7 @@ public class InventoryDAOTest {
    * Test Create method.
    */
   @Test
-  public void createTest(){
+  public void createTest() { 
     Inventory in = new Inventory();
     in.setName(NAME);
     in.setProductType(PRODUCT_TYPE);
@@ -68,11 +68,12 @@ public class InventoryDAOTest {
     Assert.assertTrue(inventoryDAO.findAll().contains(created));
   }
 
+
   /**
    * Test Retrieve method.
    */
   @Test
-  public void retrieveTest(){
+  public void retrieveTest() { 
     Inventory in2 = new Inventory();
     in2.setName(NAME);
     in2.setProductType(PRODUCT_TYPE);
@@ -80,14 +81,13 @@ public class InventoryDAOTest {
     this.mongoTemplate.save(in2);
 
     Assert.assertTrue((this.inventoryDAO.retrieve(ID).get()).equals(in2));
-
   }
 
   /**
    * Test delete method.
    */
   @Test
-  public void deleteTest(){
+  public void deleteTest() { 
     Inventory in3 = new Inventory();
     in3.setName(NAME);
     in3.setProductType(PRODUCT_TYPE);
@@ -96,7 +96,5 @@ public class InventoryDAOTest {
 
     this.inventoryDAO.delete(ID);
     Assert.assertFalse(this.inventoryDAO.retrieve(ID).isPresent());
-
   }
-
 }

@@ -42,23 +42,33 @@ public class InventoryController {
 
   /**
    * Create an Inventory.
-   * @param inventory the inventory to be created.
+   * @param inventory The inventory to be created.
    * @return The created inventory.
    */
   @PostMapping
-  public Inventory createInventory(@RequestBody Inventory inventory){
+  public Inventory createInventory(@RequestBody Inventory inventory) {
     return this.inventoryDAO.create(inventory);
+  }
+
+  /*
+   * Update an Inventory.
+   * @param inventory The inventory to be updated.
+   * @return The updated inventory.
+   */
+  @PostMapping("/update")
+  public Inventory updateInventory(@RequestBody Inventory inventory) { 
+    return this.inventoryDAO.updateMe(inventory);
   }
 
   /**
    * Delete an Inventory.
-   * @param id the inventory id as a String.
-   * @return the deleted inventory.
+   * @param id The inventory id as a String.
+   * @return The deleted inventory.
    */
   @DeleteMapping
-  public Inventory deleteInventory(@RequestBody String id){
+  public Inventory deleteInventory(@RequestBody String id) {
     Optional<Inventory> ret = this.inventoryDAO.delete(id);
-    if(ret.isPresent()){
+    if (ret.isPresent()) {
       return ret.get();
     }
     return null;
