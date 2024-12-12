@@ -8,6 +8,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,23 +43,37 @@ public class InventoryController {
 
   /**
    * Create an Inventory.
-   * @param inventory the inventory to be created.
+   * @param inventory The inventory to be created.
    * @return The created inventory.
    */
   @PostMapping
-  public Inventory createInventory(@RequestBody Inventory inventory){
+  public Inventory createInventory(@RequestBody Inventory inventory) {
     return this.inventoryDAO.create(inventory);
+  }
+
+  /*
+   * Update an Inventory.
+   * @param inventory The inventory to be updated.
+   * @return The updated inventory.
+   */
+  @PutMapping("/update")
+  public Inventory updateInventory(@RequestBody Inventory inventory) { 
+    Optional<Inventory> ret = this.inventoryDAO.update(inventory);
+    if (ret.isPresent()) {
+      return ret.get();
+    }
+    return null;
   }
 
   /**
    * Delete an Inventory.
-   * @param id the inventory id as a String.
-   * @return the deleted inventory.
+   * @param id The inventory id as a String.
+   * @return The deleted inventory.
    */
   @DeleteMapping
-  public Inventory deleteInventory(@RequestBody String id){
+  public Inventory deleteInventory(@RequestBody String id) {
     Optional<Inventory> ret = this.inventoryDAO.delete(id);
-    if(ret.isPresent()){
+    if (ret.isPresent()) {
       return ret.get();
     }
     return null;

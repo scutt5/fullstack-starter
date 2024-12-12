@@ -8,10 +8,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexOperations;
-import org.springframework.util.Assert;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import com.mongodb.client.result.DeleteResult;
+import org.springframework.util.Assert;
 
 /**
  * Inventory DAO
@@ -51,7 +50,7 @@ public class InventoryDAO {
   /**
    * Save Inventory.
    * @param inventory Inventory to Save/Update.
-   * @return Created/Updated Inventory.
+   * @return Created Inventory.
    */
   public Inventory create(Inventory inventory) {
     // insert a new Inventory object into the Mongo Collection and 
@@ -69,19 +68,16 @@ public class InventoryDAO {
   public Optional<Inventory> retrieve(String id) {
     Inventory ret = mongoTemplate.findById(id, Inventory.class);
 
-    //built-in null handling
     return Optional.ofNullable(ret);
   }
 
   /**
    * Update Inventory.
-   * @param id Inventory id to Update.
    * @param inventory Inventory to Update.
    * @return Updated Inventory.
    */
-  public Optional<Inventory> update(String id, Inventory inventory) {
-    // TODO
-    return Optional.empty();
+  public Optional<Inventory> update(Inventory inventory) {
+    return Optional.ofNullable(mongoTemplate.save(inventory));
   }
 
   /**
