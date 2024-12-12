@@ -57,7 +57,11 @@ public class InventoryController {
    */
   @PostMapping("/update")
   public Inventory updateInventory(@RequestBody Inventory inventory) { 
-    return this.inventoryDAO.updateMe(inventory);
+    Optional<Inventory> ret = this.inventoryDAO.update(inventory);
+    if (ret.isPresent()) {
+      return ret.get();
+    }
+    return null;
   }
 
   /**

@@ -76,9 +76,8 @@ public class InventoryDAO {
    * @param inventory Inventory to Update.
    * @return Updated Inventory.
    */
-  public Inventory updateMe(Inventory inventory) {
-    mongoTemplate.save(inventory);
-    return inventory;
+  public Optional<Inventory> update(Inventory inventory) {
+    return Optional.ofNullable(mongoTemplate.save(inventory));
   }
 
   /**
