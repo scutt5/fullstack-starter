@@ -57,7 +57,7 @@ export const createInventory = createAction(actions.INVENTORY_CREATE, (payload) 
 
 export const updateInventory = createAction(actions.INVENTORY_UPDATE, (payload) =>
   (dispatch, getState, config) => axios
-    .post(`${config.restAPIUrl}/inventory/update`, payload)
+    .put(`${config.restAPIUrl}/inventory/update`, payload)
     .then((suc) => {
       //add updated inventory to current state's list of objects.
       const invs = []
