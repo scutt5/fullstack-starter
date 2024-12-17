@@ -2,6 +2,7 @@ import * as inventoryDuck from '../ducks/inventory'
 import * as productDuck from '../ducks/products'
 import Checkbox from '@material-ui/core/Checkbox'
 import Grid from '@material-ui/core/Grid'
+import InventoryFormModal from '../components/Inventory/InventoryFormModal'
 import { makeStyles } from '@material-ui/core/styles'
 import { MeasurementUnits } from '../constants/units'
 import moment from 'moment'
@@ -12,7 +13,7 @@ import TableCell from '@material-ui/core/TableCell'
 import TableContainer from '@material-ui/core/TableContainer'
 import TableRow from '@material-ui/core/TableRow'
 import { EnhancedTableHead, EnhancedTableToolbar, getComparator, stableSort } from '../components/Table'
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 const useStyles = makeStyles((theme) => ({
@@ -46,14 +47,52 @@ const headCells = [
 const InventoryLayout = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
+
+  /*Callbacks here*/
+  // should have the same name as duck function
   const inventory = useSelector(state => state.inventory.all)
   const isFetched = useSelector(state => state.inventory.fetched && state.products.fetched)
+  const createInventory = useCallback(inventory => { dispatch(inventoryDuck.createInventory(inventory)) }, [dispatch])
+
+
   useEffect(() => {
     if (!isFetched) {
       dispatch(inventoryDuck.findInventory())
       dispatch(productDuck.findProducts())
     }
   }, [dispatch, isFetched])
+
+  /*Add constants here*/
+  const [isCreateOpen, setCreateOpen] = React.useState(false)
+
+  /*Add toggle functions here*/
+  const toggleCreate = () => {
+    setCreateOpen(true)
+  }
+
+  const toggleModals = (resetChecked) => {
+    setCreateOpen(false)
+    if (resetChecked) {
+      setChecked([])
+    }
+  }
+
+  // I don't explicitly call the handleToggle function, is there somewhere I should be adding it?
+  // The reason it's included is to mimic functionality of ProductLayout.js, but I'm not knowedgeable enough
+  // of the jsx stuff to figure out where.
+
+  const [checked, setChecked] = React.useState([])
+  const handleToggle = (value) => () => {
+    const currentIndex = checked.indexOf(value)
+    const newChecked = [...checked]
+
+    if (currentIndex === -1) {
+      newChecked.push(value)
+    } else {
+      newChecked.splice(currentIndex, 1)
+    }
+    setChecked(newChecked)
+  }
 
   const normalizedInventory = normalizeInventory(inventory)
   const [order, setOrder] = React.useState('asc')
@@ -98,7 +137,11 @@ const InventoryLayout = (props) => {
   return (
     <Grid container>
       <Grid item xs={12}>
-        <EnhancedTableToolbar numSelected={selected.length} title='Inventory'/>
+        <EnhancedTableToolbar //This handles the PLUS and FILTER buttons.
+          numSelected={selected.length}
+          title='Inventory'
+          toggleCreate={toggleCreate} //triggers the modal
+        />
         <TableContainer component={Paper}>
           <Table size='small' stickyHeader>
             <EnhancedTableHead
@@ -126,7 +169,10 @@ const InventoryLayout = (props) => {
                       selected={isItemSelected}
                     >
                       <TableCell padding='checkbox'>
-                        <Checkbox checked={isItemSelected}/>
+                        <Checkbox
+                          checked={isItemSelected}
+                          onChange={handleToggle(inv.id)}
+                        />
                       </TableCell>
                       <TableCell padding='none'>{inv.name}</TableCell>
                       <TableCell align='right'>{inv.productType}</TableCell>
@@ -140,6 +186,18 @@ const InventoryLayout = (props) => {
             </TableBody>
           </Table>
         </TableContainer>
+        {/*
+            Different Actions are handled here!
+            This links back to callbacks in line 51
+        */}
+        <InventoryFormModal
+          title='Create'
+          formName='inventoryCreate'
+          isDialogOpen={isCreateOpen}
+          handleDialog={toggleModals}
+          handleInventory={createInventory} //links back to inventory duck
+          initialValues={{}}
+        />
       </Grid>
     </Grid>
   )
