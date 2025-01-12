@@ -101,6 +101,7 @@ export const removeInventory = createAction(actions.INVENTORY_DELETE, (ids) =>
 export default handleActions({
   [actions.INVENTORY_GET_ALL_PENDING]: (state) => ({
     ...state,
+    fetched: false,
   }),
   [actions.INVENTORY_REFRESH]: (state, action) => ({
     ...state,

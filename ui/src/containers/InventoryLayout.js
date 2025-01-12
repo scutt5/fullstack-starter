@@ -1,5 +1,6 @@
 import * as inventoryDuck from '../ducks/inventory'
 import * as productDuck from '../ducks/products'
+import * as Yup from 'yup'
 import Checkbox from '@material-ui/core/Checkbox'
 import Grid from '@material-ui/core/Grid'
 import InventoryFormModal from '../components/Inventory/InventoryFormModal'
@@ -48,12 +49,34 @@ const InventoryLayout = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
 
-  /*Callbacks here*/
-  // should have the same name as duck function
-  const inventory = useSelector(state => state.inventory.all)
+  /*Callbacks*/
+  const inventories = useSelector(state => state.inventory.all)
+  const products = useSelector(state => state.products.all)
   const isFetched = useSelector(state => state.inventory.fetched && state.products.fetched)
-  const createInventory = useCallback(inventory => { dispatch(inventoryDuck.createInventory(inventory)) }, [dispatch])
+  const createInventory = useCallback(payload => { dispatch(inventoryDuck.createInventory(payload)) }, [dispatch])
 
+  const initialValues = {
+    name: '',
+    description: '',
+    productType: null,
+    averagePrice: 0,
+    amount: 0,
+    unitOfMeasurement: null,
+    bestBeforeDate: null,
+    neverExpires: false,
+  }
+
+  //form validation using Yup
+  const InventoryFormSchema = Yup.object().shape({
+    name: Yup.string().required('Inventory name is required.'),
+    productType: Yup.string().required('Product Type is required.'),
+    description: Yup.string(),
+    averagePrice: Yup.number().min(0, 'Average Price must be greater than zero.'),
+    amount: Yup.number().min(0, 'Amount must be greater than zero.'),
+    unitOfMeasurement: Yup.string().required('Unit of measurement is required.'),
+    bestBeforeDate: Yup.date(),
+    neverExpires: Yup.boolean(),
+  })
 
   useEffect(() => {
     if (!isFetched) {
@@ -62,7 +85,7 @@ const InventoryLayout = (props) => {
     }
   }, [dispatch, isFetched])
 
-  /*Add constants here*/
+  /*Add constants for Actions here*/
   const [isCreateOpen, setCreateOpen] = React.useState(false)
 
   /*Add toggle functions here*/
@@ -77,10 +100,6 @@ const InventoryLayout = (props) => {
     }
   }
 
-  // I don't explicitly call the handleToggle function, is there somewhere I should be adding it?
-  // The reason it's included is to mimic functionality of ProductLayout.js, but I'm not knowedgeable enough
-  // of the jsx stuff to figure out where.
-
   const [checked, setChecked] = React.useState([])
   const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value)
@@ -94,7 +113,7 @@ const InventoryLayout = (props) => {
     setChecked(newChecked)
   }
 
-  const normalizedInventory = normalizeInventory(inventory)
+  const normalizedInventory = normalizeInventory(inventories)
   const [order, setOrder] = React.useState('asc')
   const [orderBy, setOrderBy] = React.useState('calories')
   const [selected, setSelected] = React.useState([])
@@ -196,7 +215,9 @@ const InventoryLayout = (props) => {
           isDialogOpen={isCreateOpen}
           handleDialog={toggleModals}
           handleInventory={createInventory} //links back to inventory duck
-          initialValues={{}}
+          schema={InventoryFormSchema}
+          productsList={products}
+          initialValues={initialValues}
         />
       </Grid>
     </Grid>
