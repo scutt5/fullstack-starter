@@ -1,6 +1,5 @@
 import * as inventoryDuck from '../ducks/inventory'
 import * as productDuck from '../ducks/products'
-import * as Yup from 'yup'
 import Checkbox from '@material-ui/core/Checkbox'
 import Grid from '@material-ui/core/Grid'
 import InventoryFormModal from '../components/Inventory/InventoryFormModal'
@@ -49,11 +48,18 @@ const InventoryLayout = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
 
-  /*Callbacks*/
   const inventories = useSelector(state => state.inventory.all)
   const products = useSelector(state => state.products.all)
   const isFetched = useSelector(state => state.inventory.fetched && state.products.fetched)
-  const createInventory = useCallback(payload => { dispatch(inventoryDuck.createInventory(payload)) }, [dispatch])
+
+  /*Add callbacks for actions here*/
+  const createInventory = useCallback(payload =>
+  {
+    if (payload.bestBeforeDate) {
+      payload.bestBeforeDate = moment(payload.bestBeforeDate).toISOString()
+    }
+    dispatch(inventoryDuck.createInventory(payload))
+  }, [dispatch])
 
   const initialValues = {
     name: '',
@@ -62,21 +68,9 @@ const InventoryLayout = (props) => {
     averagePrice: 0,
     amount: 0,
     unitOfMeasurement: null,
-    bestBeforeDate: null,
+    bestBeforeDate: moment(),
     neverExpires: false,
   }
-
-  //form validation using Yup
-  const InventoryFormSchema = Yup.object().shape({
-    name: Yup.string().required('Inventory name is required.'),
-    productType: Yup.string().required('Product Type is required.'),
-    description: Yup.string(),
-    averagePrice: Yup.number().min(0, 'Average Price must be greater than zero.'),
-    amount: Yup.number().min(0, 'Amount must be greater than zero.'),
-    unitOfMeasurement: Yup.string().required('Unit of measurement is required.'),
-    bestBeforeDate: Yup.date(),
-    neverExpires: Yup.boolean(),
-  })
 
   useEffect(() => {
     if (!isFetched) {
@@ -156,10 +150,10 @@ const InventoryLayout = (props) => {
   return (
     <Grid container>
       <Grid item xs={12}>
-        <EnhancedTableToolbar //This handles the PLUS and FILTER buttons.
+        <EnhancedTableToolbar
           numSelected={selected.length}
           title='Inventory'
-          toggleCreate={toggleCreate} //triggers the modal
+          toggleCreate={toggleCreate}
         />
         <TableContainer component={Paper}>
           <Table size='small' stickyHeader>
@@ -206,8 +200,7 @@ const InventoryLayout = (props) => {
           </Table>
         </TableContainer>
         {/*
-            Different Actions are handled here!
-            This links back to callbacks in line 51
+            Different Actions handled here.
         */}
         <InventoryFormModal
           title='Create'
@@ -215,7 +208,6 @@ const InventoryLayout = (props) => {
           isDialogOpen={isCreateOpen}
           handleDialog={toggleModals}
           handleInventory={createInventory} //links back to inventory duck
-          schema={InventoryFormSchema}
           productsList={products}
           initialValues={initialValues}
         />
