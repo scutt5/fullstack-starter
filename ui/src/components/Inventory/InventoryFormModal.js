@@ -29,6 +29,20 @@ const InventoryFormModal = ({
     { label: 'Quart', value: 'QUART' }
   ]
 
+  const validate = (values) => {
+    let errors = {}
+
+    if (!values.productType) {
+      errors.productType = 'Product Type is required.'
+    }
+
+    if (!values.unitOfMeasurement) {
+      errors.unitOfMeasurement = 'Unit of Measurement is required.'
+    }
+
+    return errors
+  }
+
   return (
     <Dialog
       open={isDialogOpen}
@@ -38,13 +52,13 @@ const InventoryFormModal = ({
     >
       <Formik
         initialValues={initialValues}
+        validate={validate}
         onSubmit={values => {
           handleInventory(values)
           handleDialog(true)
         }}>
         {helpers =>
           <Form
-            noValidate
             autoComplete='off'
             id={formName}
           >
@@ -139,7 +153,6 @@ const InventoryFormModal = ({
                   <Field
                     name='neverExpires'
                     type='checkbox'
-                    required
                     render={({ field, form }) =>
                       <FormControlLabel
                         control={
