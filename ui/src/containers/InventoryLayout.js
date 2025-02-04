@@ -2,6 +2,7 @@ import * as inventoryDuck from '../ducks/inventory'
 import * as productDuck from '../ducks/products'
 import Checkbox from '@material-ui/core/Checkbox'
 import Grid from '@material-ui/core/Grid'
+import InventoryFormModal from '../components/Inventory/InventoryFormModal'
 import { makeStyles } from '@material-ui/core/styles'
 import { MeasurementUnits } from '../constants/units'
 import moment from 'moment'
@@ -12,7 +13,7 @@ import TableCell from '@material-ui/core/TableCell'
 import TableContainer from '@material-ui/core/TableContainer'
 import TableRow from '@material-ui/core/TableRow'
 import { EnhancedTableHead, EnhancedTableToolbar, getComparator, stableSort } from '../components/Table'
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 const useStyles = makeStyles((theme) => ({
@@ -46,8 +47,31 @@ const headCells = [
 const InventoryLayout = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const inventory = useSelector(state => state.inventory.all)
+
+  const inventories = useSelector(state => state.inventory.all)
+  const products = useSelector(state => state.products.all)
   const isFetched = useSelector(state => state.inventory.fetched && state.products.fetched)
+
+  /*Add callbacks for actions here*/
+  const createInventory = useCallback(payload =>
+  {
+    if (payload.bestBeforeDate) {
+      payload.bestBeforeDate = moment(payload.bestBeforeDate).toISOString()
+    }
+    dispatch(inventoryDuck.createInventory(payload))
+  }, [dispatch])
+
+  const initialValues = {
+    name: '',
+    description: '',
+    productType: null,
+    averagePrice: 0,
+    amount: 0,
+    unitOfMeasurement: null,
+    bestBeforeDate: moment().format('YYYY-MM-DD'),
+    neverExpires: false,
+  }
+
   useEffect(() => {
     if (!isFetched) {
       dispatch(inventoryDuck.findInventory())
@@ -55,7 +79,35 @@ const InventoryLayout = (props) => {
     }
   }, [dispatch, isFetched])
 
-  const normalizedInventory = normalizeInventory(inventory)
+  /*Add constants for Actions here*/
+  const [isCreateOpen, setCreateOpen] = React.useState(false)
+
+  /*Add toggle functions here*/
+  const toggleCreate = () => {
+    setCreateOpen(true)
+  }
+
+  const toggleModals = (resetChecked) => {
+    setCreateOpen(false)
+    if (resetChecked) {
+      setChecked([])
+    }
+  }
+
+  const [checked, setChecked] = React.useState([])
+  const handleToggle = (value) => () => {
+    const currentIndex = checked.indexOf(value)
+    const newChecked = [...checked]
+
+    if (currentIndex === -1) {
+      newChecked.push(value)
+    } else {
+      newChecked.splice(currentIndex, 1)
+    }
+    setChecked(newChecked)
+  }
+
+  const normalizedInventory = normalizeInventory(inventories)
   const [order, setOrder] = React.useState('asc')
   const [orderBy, setOrderBy] = React.useState('calories')
   const [selected, setSelected] = React.useState([])
@@ -98,7 +150,11 @@ const InventoryLayout = (props) => {
   return (
     <Grid container>
       <Grid item xs={12}>
-        <EnhancedTableToolbar numSelected={selected.length} title='Inventory'/>
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          title='Inventory'
+          toggleCreate={toggleCreate}
+        />
         <TableContainer component={Paper}>
           <Table size='small' stickyHeader>
             <EnhancedTableHead
@@ -126,7 +182,10 @@ const InventoryLayout = (props) => {
                       selected={isItemSelected}
                     >
                       <TableCell padding='checkbox'>
-                        <Checkbox checked={isItemSelected}/>
+                        <Checkbox
+                          checked={isItemSelected}
+                          onChange={handleToggle(inv.id)}
+                        />
                       </TableCell>
                       <TableCell padding='none'>{inv.name}</TableCell>
                       <TableCell align='right'>{inv.productType}</TableCell>
@@ -140,6 +199,18 @@ const InventoryLayout = (props) => {
             </TableBody>
           </Table>
         </TableContainer>
+        {/*
+            Different Actions handled here.
+        */}
+        <InventoryFormModal
+          title='Create'
+          formName='inventoryCreate'
+          isDialogOpen={isCreateOpen}
+          handleDialog={toggleModals}
+          handleInventory={createInventory} //links back to inventory duck
+          productsList={products}
+          initialValues={initialValues}
+        />
       </Grid>
     </Grid>
   )
