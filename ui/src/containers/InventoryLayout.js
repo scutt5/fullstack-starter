@@ -2,6 +2,7 @@ import * as inventoryDuck from '../ducks/inventory'
 import * as productDuck from '../ducks/products'
 import Checkbox from '@material-ui/core/Checkbox'
 import Grid from '@material-ui/core/Grid'
+import InventoryDeleteModal from '../components/Inventory/InventoryDeleteModal'
 import InventoryFormModal from '../components/Inventory/InventoryFormModal'
 import { makeStyles } from '@material-ui/core/styles'
 import { MeasurementUnits } from '../constants/units'
@@ -61,6 +62,8 @@ const InventoryLayout = (props) => {
     dispatch(inventoryDuck.createInventory(payload))
   }, [dispatch])
 
+  const removeInventory = useCallback(ids => { dispatch(inventoryDuck.removeInventory(ids)) }, [dispatch])
+
   const initialValues = {
     name: '',
     description: '',
@@ -81,14 +84,19 @@ const InventoryLayout = (props) => {
 
   /*Add constants for Actions here*/
   const [isCreateOpen, setCreateOpen] = React.useState(false)
+  const [isDeleteOpen, setDeleteOpen] = React.useState(false)
 
   /*Add toggle functions here*/
   const toggleCreate = () => {
     setCreateOpen(true)
   }
+  const toggleDelete = () => {
+    setDeleteOpen(true)
+  }
 
   const toggleModals = (resetChecked) => {
     setCreateOpen(false)
+    setDeleteOpen(false)
     if (resetChecked) {
       setChecked([])
     }
@@ -154,6 +162,7 @@ const InventoryLayout = (props) => {
           numSelected={selected.length}
           title='Inventory'
           toggleCreate={toggleCreate}
+          toggleDelete={toggleDelete}
         />
         <TableContainer component={Paper}>
           <Table size='small' stickyHeader>
@@ -207,9 +216,15 @@ const InventoryLayout = (props) => {
           formName='inventoryCreate'
           isDialogOpen={isCreateOpen}
           handleDialog={toggleModals}
-          handleInventory={createInventory} //links back to inventory duck
+          handleInventory={createInventory}
           productsList={products}
           initialValues={initialValues}
+        />
+        <InventoryDeleteModal
+          isDialogOpen={isDeleteOpen}
+          handleDelete={removeInventory}
+          handleDialog={toggleModals}
+          initialValues={checked.map(check => check.id)}
         />
       </Grid>
     </Grid>
