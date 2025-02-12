@@ -1,6 +1,7 @@
 package com.starter.fullstack.dao;
 
 import com.starter.fullstack.api.Inventory;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
@@ -89,5 +90,18 @@ public class InventoryDAO {
     Query query = new Query(Criteria.where("id").is(id));
     
     return Optional.ofNullable(this.mongoTemplate.findAndRemove(query, Inventory.class));
+  }
+
+  /**
+   * Delete a list of Inventories by Id.
+   * @param ids list of Ids.
+   * @return list of deleted inventories.
+   */
+  public List<Optional<Inventory>> delete(List<String> ids) {
+    List<Optional<Inventory>> ret = new LinkedList<>();
+    for (String i : ids) {
+      ret.add(delete(i));
+    }
+    return ret;
   }
 }
