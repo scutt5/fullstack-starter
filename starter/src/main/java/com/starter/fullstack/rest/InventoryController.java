@@ -66,32 +66,19 @@ public class InventoryController {
     return null;
   }
 
-  /* 
   /**
-   * Delete an Inventory.
-   * @param id The inventory id as a String.
-   * @return The deleted inventory.
-   
-  @DeleteMapping
-  public Inventory deleteInventory(@RequestBody String id) {
-    Optional<Inventory> ret = this.inventoryDAO.delete(id);
-    if (ret.isPresent()) {
-      return ret.get();
-    }
-    return null;
-  }
-  */
-
+   * Delete a single Inventory, or list of Inventories.
+   * @param ids List of Inventories to be deleted as Strings.
+   * @return The deleted Inventories.
+   */
   @DeleteMapping
   public List<Inventory> deleteInventory(@RequestBody List<String> ids) {
-    List<Optional<Inventory>> rets = this.inventoryDAO.delete(ids);
-    List<Inventory> vals = new LinkedList();
-    for (Optional<Inventory> r : rets) {
-      if (r.isPresent()) {
-        vals.add(r.get());
-      }
+    List<Inventory> rets = new LinkedList<Inventory>();
+    //check if not empty.
+    if (ids.size() > 0) {
+      rets = this.inventoryDAO.delete(ids);
     }
-    return vals;
+    return rets;
   }
 }
 
