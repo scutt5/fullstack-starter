@@ -1,6 +1,7 @@
 package com.starter.fullstack.dao;
 
 import com.starter.fullstack.api.Inventory;
+import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Resource;
 import org.junit.After;
@@ -84,7 +85,8 @@ public class InventoryDAOTest {
   }
 
   /**
-   * Test delete method.
+   * Test delete method.'
+   * Updated to pass list of inventories to be deleted.
    */
   @Test
   public void deleteTest() { 
@@ -94,7 +96,9 @@ public class InventoryDAOTest {
     in3.setId(ID);
     this.mongoTemplate.save(in3);  
 
-    this.inventoryDAO.delete(ID);
+    List<String> del = new LinkedList<String>();
+    del.add(ID);
+    this.inventoryDAO.delete(del);
     Assert.assertFalse(this.inventoryDAO.retrieve(ID).isPresent());
   }
 }
