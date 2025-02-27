@@ -94,25 +94,26 @@ const InventoryLayout = (props) => {
     setDeleteOpen(true)
   }
 
-  const toggleModals = (resetChecked) => {
+  //changed to use selected instead of checked
+  const toggleModals = (resetSelected) => {
     setCreateOpen(false)
     setDeleteOpen(false)
-    if (resetChecked) {
-      setChecked([])
+    if (resetSelected) {
+      setSelected([])
     }
   }
 
-  const [checked, setChecked] = React.useState([])
+  //changed to use selected instead of checked
   const handleToggle = (value) => () => {
-    const currentIndex = checked.indexOf(value)
-    const newChecked = [...checked]
+    const currentIndex = selected.indexOf(value)
+    const newSelected = [...selected]
 
     if (currentIndex === -1) {
-      newChecked.push(value)
+      newSelected.push(value)
     } else {
-      newChecked.splice(currentIndex, 1)
+      newSelected.splice(currentIndex, 1)
     }
-    setChecked(newChecked)
+    setSelected(newSelected)
   }
 
   const normalizedInventory = normalizeInventory(inventories)
@@ -224,7 +225,7 @@ const InventoryLayout = (props) => {
           isDialogOpen={isDeleteOpen}
           handleDelete={removeInventory}
           handleDialog={toggleModals}
-          initialValues={checked}
+          initialValues={selected}
         />
       </Grid>
     </Grid>
