@@ -62,7 +62,9 @@ const InventoryLayout = (props) => {
     dispatch(inventoryDuck.createInventory(payload))
   }, [dispatch])
 
-  const removeInventory = useCallback(ids => { dispatch(inventoryDuck.removeInventory(ids)) }, [dispatch])
+  const removeInventory = useCallback(ids => {
+    dispatch(inventoryDuck.removeInventory(ids))
+  }, [dispatch])
 
   const initialValues = {
     name: '',
@@ -94,26 +96,25 @@ const InventoryLayout = (props) => {
     setDeleteOpen(true)
   }
 
-  //changed to use selected instead of checked
-  const toggleModals = (resetSelected) => {
+  const toggleModals = (resetChecked) => {
     setCreateOpen(false)
     setDeleteOpen(false)
-    if (resetSelected) {
+    if (resetChecked) {
       setSelected([])
     }
   }
 
-  //changed to use selected instead of checked
+  const [checked, setChecked] = React.useState([])
   const handleToggle = (value) => () => {
-    const currentIndex = selected.indexOf(value)
-    const newSelected = [...selected]
+    const currentIndex = checked.indexOf(value)
+    const newChecked = [...checked]
 
     if (currentIndex === -1) {
-      newSelected.push(value)
+      newChecked.push(value)
     } else {
-      newSelected.splice(currentIndex, 1)
+      newChecked.splice(currentIndex, 1)
     }
-    setSelected(newSelected)
+    setChecked(newChecked)
   }
 
   const normalizedInventory = normalizeInventory(inventories)

@@ -37,7 +37,7 @@ const InventoryDeleteModal = ({
         form='deleteInventory'
         onClick={() => {
           handleDelete(initialValues)//fires off the delete modal
-          handleDialog(false)//closes the dialog
+          handleDialog(true)//closes the dialog
         }}
         color='secondary'
       >
