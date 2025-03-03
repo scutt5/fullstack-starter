@@ -2,6 +2,7 @@ package com.starter.fullstack.rest;
 
 import com.starter.fullstack.api.Inventory;
 import com.starter.fullstack.dao.InventoryDAO;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.util.Assert;
@@ -66,17 +67,18 @@ public class InventoryController {
   }
 
   /**
-   * Delete an Inventory.
-   * @param id The inventory id as a String.
-   * @return The deleted inventory.
+   * Delete a single Inventory, or list of Inventories.
+   * @param ids List of Inventories to be deleted as Strings.
+   * @return The deleted Inventories.
    */
   @DeleteMapping
-  public Inventory deleteInventory(@RequestBody String id) {
-    Optional<Inventory> ret = this.inventoryDAO.delete(id);
-    if (ret.isPresent()) {
-      return ret.get();
+  public List<Inventory> deleteInventory(@RequestBody List<String> ids) {
+    List<Inventory> rets = new LinkedList<Inventory>();
+    //check if not empty.
+    if (ids.size() > 0) {
+      rets = this.inventoryDAO.delete(ids);
     }
-    return null;
+    return rets;
   }
 }
 

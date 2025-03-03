@@ -79,7 +79,7 @@ export const updateInventory = createAction(actions.INVENTORY_UPDATE, (payload) 
 
 export const removeInventory = createAction(actions.INVENTORY_DELETE, (ids) =>
   (dispatch, getState, config) => axios
-    .delete(`${config.restAPIUrl}/inventory`, { data: ids })
+    .delete(`${config.restAPIUrl}/inventory`, { data: ids } )
     .then((suc) => {
       const invs = []
       getState().inventory.all.forEach(inv => {
