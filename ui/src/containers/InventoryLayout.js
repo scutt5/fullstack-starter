@@ -112,6 +112,7 @@ const InventoryLayout = (props) => {
     setEditOpen(false)
     if (resetChecked) {
       setSelected([])
+      setChecked([])
     }
   }
 
@@ -258,7 +259,7 @@ const InventoryLayout = (props) => {
           handleDialog={toggleModals}
           handleInventory={updateInventory}
           productsList={products}
-          initialValues={selected[0]} //NOTE: may need to change
+          initialValues={selected[0]}
         />
       </Grid>
     </Grid>
