@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
 const normalizeInventory = (inventory) => inventory.map(inv => ({
   ...inv,
   unitOfMeasurement: MeasurementUnits[inv.unitOfMeasurement].name,
-  bestBeforeDate: moment(inv.bestBeforeDate).format('MM/DD/YYYY')
+  bestBeforeDate: moment(inv.bestBeforeDate).format('MM/DD/YYYY'),
 }))
 
 const headCells = [
@@ -66,6 +66,14 @@ const InventoryLayout = (props) => {
     dispatch(inventoryDuck.removeInventory(ids))
   }, [dispatch])
 
+  const updateInventory = useCallback(payload =>
+  {
+    if (payload.bestBeforeDate) {
+      payload.bestBeforeDate = moment(payload.bestBeforeDate).toISOString()
+    }
+    dispatch(inventoryDuck.updateInventory(payload))
+  }, [dispatch])
+
   const initialValues = {
     name: '',
     description: '',
@@ -87,6 +95,7 @@ const InventoryLayout = (props) => {
   /*Add constants for Actions here*/
   const [isCreateOpen, setCreateOpen] = React.useState(false)
   const [isDeleteOpen, setDeleteOpen] = React.useState(false)
+  const [isEditOpen, setEditOpen] = React.useState(false)
 
   /*Add toggle functions here*/
   const toggleCreate = () => {
@@ -96,11 +105,14 @@ const InventoryLayout = (props) => {
     setDeleteOpen(true)
   }
 
+  /*Add each toggle to toggleModals */
   const toggleModals = (resetChecked) => {
     setCreateOpen(false)
     setDeleteOpen(false)
+    setEditOpen(false)
     if (resetChecked) {
       setSelected([])
+      setChecked([])
     }
   }
 
@@ -157,6 +169,17 @@ const InventoryLayout = (props) => {
 
   const isSelected = (id) => selected.indexOf(id) !== -1
 
+  /* Need to pass actual inventory to form, not just ID */
+  const handleEdit = () => {
+    if (checked.length === 1) {
+      const editInv = inventories.find(inv => inv.id == checked[0])
+      if (editInv) {
+        setSelected([editInv])
+        setEditOpen(true)
+      }
+    }
+  }
+
   return (
     <Grid container>
       <Grid item xs={12}>
@@ -165,6 +188,7 @@ const InventoryLayout = (props) => {
           title='Inventory'
           toggleCreate={toggleCreate}
           toggleDelete={toggleDelete}
+          toggleEdit={handleEdit}
         />
         <TableContainer component={Paper}>
           <Table size='small' stickyHeader>
@@ -227,6 +251,15 @@ const InventoryLayout = (props) => {
           handleDelete={removeInventory}
           handleDialog={toggleModals}
           initialValues={selected}
+        />
+        <InventoryFormModal
+          title='Edit'
+          formName='inventoryEdit'
+          isDialogOpen={isEditOpen}
+          handleDialog={toggleModals}
+          handleInventory={updateInventory}
+          productsList={products}
+          initialValues={selected[0]}
         />
       </Grid>
     </Grid>
